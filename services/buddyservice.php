@@ -1,8 +1,4 @@
 <?php
-include_once HOME . DS . 'model' . DS . 'buddy.php';
-include_once HOME . DS . 'model' . DS . 'buddysearchparameter.php';
-include_once HOME . DS . 'model' . DS . 'buddylocation.php';
-include_once HOME . DS . 'model' . DS . 'buddysearchtag.php';
 include_once HOME . DS . 'model' . DS . 'exception' . DS . 'customexception.php';
 include_once HOME . DS . 'services' . DS . 'dashcategoryservice.php';
 
@@ -63,6 +59,7 @@ class BuddyService extends BaseDAO{
 			$buddy->email = $result['email'];
 			$buddy->fax = $result['fax'];
 			$buddy->url = $result['url'];
+			$buddy->seed = $result['seed'];
 			$dashboardCategoryService = new DashcategoryService();
 			$buddy->setDashboardCategory($dashboardCategoryService->getDashboardCategoryById($result['dashboard_category_id']));
 			array_push($buddies, $buddy);
@@ -83,6 +80,7 @@ class BuddyService extends BaseDAO{
 			$stmt->bindValue("email", $newbuddy->email, PDO::PARAM_STR );
 			$stmt->bindValue("fax", $newbuddy->fax, PDO::PARAM_STR );
 			$stmt->bindValue("url", $newbuddy->url, PDO::PARAM_STR );
+			$stmt->bindValue("seed", $newbuddy->seed, PDO::PARAM_STR );
 			$stmt->bindValue("dasboardcategoryid", $newbuddy->getDashboardCategory()->id, PDO::PARAM_STR );
 			$stmt->execute();
 			return true;
@@ -110,6 +108,7 @@ class BuddyService extends BaseDAO{
 				$buddy->email = $result['email'];
 				$buddy->fax = $result['fax'];
 				$buddy->url = $result['url'];
+				$buddy->seed = $result['seed'];
 				return $buddy;
 			}
 			return null;
@@ -120,7 +119,7 @@ class BuddyService extends BaseDAO{
 
 	public function edit($newbuddy){
 		try {
-			$sql = "UPDATE buddy set date_last_updated=:datelastupdated, record_status=:status, name=:name, tagline=:tagline, address=:address, telphone=:telphone, email=:email, fax=:fax, url=:url WHERE id=:id";
+			$sql = "UPDATE buddy set date_last_updated=:datelastupdated, record_status=:status, name=:name, tagline=:tagline, address=:address, telphone=:telphone, email=:email, fax=:fax, url=:url, seed=:seed WHERE id=:id";
 			$stmt = $this->db->prepare ($sql);
 			$stmt->bindValue("datelastupdated", $newbuddy->dateupdated, PDO::PARAM_STR );
 			$stmt->bindValue("status", (int)$newbuddy->status, PDO::PARAM_STR );
@@ -132,6 +131,7 @@ class BuddyService extends BaseDAO{
 			$stmt->bindValue("fax", $newbuddy->fax, PDO::PARAM_STR );
 			$stmt->bindValue("url", $newbuddy->url, PDO::PARAM_STR );
 			$stmt->bindValue("id", $newbuddy->id, PDO::PARAM_STR );
+			$stmt->bindValue("seed", $newbuddy->seed, PDO::PARAM_STR );
 			$stmt->execute();
 			return true;
 		}catch (PDOException $e){
@@ -158,6 +158,8 @@ class BuddyService extends BaseDAO{
 			//Rating
 
 			//comment
+			
+			//Delete location, searchtag, image, 
 
 			$sql = "DELETE FROM buddy WHERE id=:id";
 			$stmt = $this->db->prepare ($sql);

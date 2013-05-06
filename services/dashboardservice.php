@@ -1,7 +1,4 @@
 <?php
-include_once HOME . DS . 'model' . DS . 'buddy.php';
-include_once HOME . DS . 'model' . DS . 'dashboard.php';
-include_once HOME . DS . 'model' . DS . 'dashboardcategory.php';
 include_once HOME . DS . 'model' . DS . 'exception' . DS . 'customexception.php';
 include_once HOME . DS . 'services' . DS . 'dashcategoryservice.php';
 include_once HOME . DS . 'services' . DS . 'buddyservice.php';

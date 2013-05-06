@@ -12,7 +12,6 @@ class Buddy extends BaseData{
 	var $url;
 	var $dashboardCategory;
 	var $seed;
-	var $imageName;
 	
 	public function  __construct(){
 		parent::__construct();
@@ -88,14 +87,6 @@ class Buddy extends BaseData{
 	
 	public function getSeed(){
 		return $this->seed;
-	}
-	
-	public function setImageName($imageName){
-		$this->imageName = $imageName;
-	}
-	
-	public function getImageName(){
-		return $this->imageName;
 	}
 }
 ?>

@@ -528,3 +528,47 @@ span.disabled {
 	padding-top: 5px;
 	float: left;
 }
+
+.panel .cpanel {
+	width: 98%;
+	margin: 10px;
+	float: left;
+}
+
+.panel .cpanel .cpanel_row {
+	display: inline;
+}
+
+.panel .cpanel_row  .cpanel_item {
+	display: inline-block;
+	padding: 5px;
+	background: rgb(238, 229, 229);
+	margin-right: 10px;
+}
+
+.panel .cpanel_row  .cpanel_item:HOVER {
+	background: rgb(226, 219, 219);
+}
+
+.panel .cpanel_row  .cpanel_item span.user_icon {
+	background: url("../images/cpanel_user_icon.png");
+	background-repeat: no-repeat;
+	width: 80px;
+	height: 80px;
+	float: left;
+}
+.panel .cpanel_row  .cpanel_item span.seeding_icon {
+	background: url("../images/cpanel_seeding_icon.png");
+	background-repeat: no-repeat;
+	width: 80px;
+	height: 80px;
+	float: left;
+}
+.panel .cpanel_row  .cpanel_item span#text {
+	display: run-in;
+	text-decoration: none;
+	text-align: center;
+}
+span {
+	vertical-align: top;
+}

@@ -1,7 +1,11 @@
+<?php 
+if (session_id() == ''){
+	session_start();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<?php //@session_start();?>
 		<meta charset="utf-8" />
 		<title>Saraka Web Portal</title>
 		<link rel="stylesheet" type="text/css" href="<?php echo BASEURL . DS . 'utilities' . DS . 'css' . DS . 'system.css';?>" />

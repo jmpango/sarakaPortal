@@ -102,6 +102,7 @@ class BuddyController extends BaseController{
 				$newBuddy->setEmail(isset($_POST['email']) ? trim($_POST['email']) : null);
 				$newBuddy->setFax(isset($_POST['fax']) ? trim($_POST['fax']) : null);
 				$newBuddy->setUrl(isset($_POST['url']) ? trim($_POST['url']) : null);
+				$newBuddy->setSeed(isset($_POST['seed']) ? trim($_POST['seed']) : null);
 				$newBuddy->setDashboardCategory($this->getDashboardCategory($dashboardCategoryId));
 					
 				if($newBuddy->getId() != null){
@@ -169,6 +170,9 @@ class BuddyController extends BaseController{
 		$this->view->set('email', $buddy->email);
 		$this->view->set('fax', $buddy->fax);
 		$this->view->set('url', $buddy->url);
+		
+		//TODO add a list of Seeeds.
+		
 		$this->view->set('dashcategory', $dashboardCategory);
 		return $this->view->output();
 	}

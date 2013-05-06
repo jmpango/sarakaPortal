@@ -1,16 +1,10 @@
 <?php 
-include_once HOME . DS . 'model' . DS . 'user.php';
-include_once HOME . DS . 'model' . DS . 'buddy.php';
-include_once HOME . DS . 'model' . DS . 'buddyrating.php';
 include_once HOME . DS . 'views' . DS . 'header.php';
+if(isset($_SESSION['user'])){
 ?>
     <div class="main-wrapper">
     	<div class="panel">
-    		<div class="menu_dv layout">
-    			<div class="menu"><a href="<?php echo  BASEURL;?>" title="Home">Home</a></div>
-    			<div class="menu"><a href="<?php echo  BASEURL . DS . 'dashboard' .DS . 'listing';?>" title="Dashboard Listing">Dashboard</a></div>
-    			<div class="menu"><a href="<?php echo  BASEURL;?>" title="Control Panel">C panel</a></div>
-    		</div>
+    		<?php include_once HOME.DS.'views'.DS.'menu.php';?>
     		<div class="content layout">
     			<div class="breadcrumb">
     				<span class="text"><a href="<?php echo BASEURL;?>" title="back to home">Home</a></span>
@@ -114,3 +108,8 @@ include_once HOME . DS . 'views' . DS . 'header.php';
     	</div>
     	<?php include_once HOME.DS.'views'.DS.'footer.php';?>
     </div>
+    <?php 
+		}else{
+			header('Location: '.BASEURL.'/login/index');
+		}
+    ?>
