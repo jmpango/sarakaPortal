@@ -120,9 +120,10 @@ class DashcategoryService extends BaseDAO{
 				$query = "AND d.record_status=:status ";
 			}
 
-			$sql = "SELECT * FROM dashboardcategory d WHERE d.cname LIKE :query ".$query."ORDER BY d.cname ASC";
+			$sql = "SELECT * FROM dashboardcategory d WHERE d.cname LIKE :query AND d.dashboard_id =:dashboardid ".$query."ORDER BY d.cname ASC";
 			$stmt = $this->db->prepare ($sql);
 			$stmt->bindValue('query', $name.'%');
+			$stmt->bindValue('dashboardid', $dashboardId);
 			if($status != ""){
 				$stmt->bindValue('status', (int)$status);
 			}

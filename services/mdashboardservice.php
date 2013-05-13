@@ -114,6 +114,7 @@ class MDashboardService extends BaseDAO{
 					$buddy['fax'] = $result['fax'];
 					$buddy['url'] = $result['url'];
 					$buddy['dashboard_category_id'] = $result['dashboard_category_id'];
+					$buddy['seed'] = $result['seed'];
 					array_push($response["buddies"], $buddy);
 				}
 			}
@@ -235,6 +236,8 @@ class MDashboardService extends BaseDAO{
 	}
 
 	public function saveMobileUsage($hits){
+		//TODO add the rate and comment hit.
+		
 		$arr = json_decode($hits, true);
 		$usages = array();
 		foreach ($arr['usages'] as $element) {

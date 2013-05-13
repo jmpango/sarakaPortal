@@ -23,6 +23,22 @@ if(isset($_SESSION['user'])){
 					<div class="formTable">
     				<form action="<?php echo BASEURL;?>/buddy/cat/save/<?php echo $dashcategory->getId();?>" method="post" >
     							<p>
+    							<span>Seed: </span>
+								<select name="seed" style="margin-left: 55px;">
+									<option  value="">Select</option>
+									<?php 
+		    							if($seedings):
+		    							foreach ($seedings as $seed):
+    								?>
+									<option value="<?php echo $seed->name?>"><?php echo $seed->name. ' : ('. $seed->description. ')'?></option>
+									<?php 
+		    							endforeach;
+		    							endif;
+    								?>
+								</select>
+    							</p>
+    							
+    							<p>
     								<input type="hidden" name="pageName" value="<?php echo 'dashcategory'.DS.'cat'.DS.'add'.DS. $dashcategory->id;?>"/>
     								<input type="hidden" name="id" value="<?php if(isset($saveForm)) echo $saveForm['id'];else echo @$id; ?>"/>
     								<span>Name: </span><span style="color: red;">*</span>

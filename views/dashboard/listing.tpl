@@ -16,7 +16,6 @@ if(isset($_SESSION['user'])){
     			<div class="search_box">
     				<form action="<?php echo BASEURL;?>/dashboard/listing/search" method="post" >
     					<fieldset>
-    						<legend>Search Panel</legend>
     							<div class="tabular">
     								<span>Name: </span><input type="text" name="query" value="<?php if(isset($searchForm)) echo $searchForm['query'];?>"/><br>
     							</div>
@@ -79,9 +78,6 @@ if(isset($_SESSION['user'])){
     					</tbody>
     				</table>
     			</div>
-	    		<div class="xmlpanel">
-	    				[<a href="" title="view dashboard xml">View XML</a>]
-	    		</div>
     		</div>
     	</div>
     	<?php include_once HOME.DS.'views'.DS.'footer.php';?>

@@ -1,6 +1,5 @@
 <div>
 	<fieldset>
-		<legend>Search Panel</legend>
 		<div class="tabular">
 			<span>Buddy Name: </span><input name="name"  type="text"><br>
 		</div>

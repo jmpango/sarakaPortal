@@ -16,7 +16,7 @@ class BuddyService extends BaseDAO{
 				$this->totalCount = $results;
 			}
 
-			$sql = "SELECT * FROM buddy d WHERE dashboard_category_id = :dashboardCategoryId ORDER BY d.name ASC Limit ".$this->offset.", ".$this->maxLimit;
+			$sql = "SELECT * FROM buddy d WHERE d.dashboard_category_id = :dashboardCategoryId ORDER BY d.name ASC Limit ".$this->offset.", ".$this->maxLimit;
 			$stmt = $this->db->prepare ($sql);
 			$stmt->bindValue('dashboardCategoryId', $dashboardCategoryId);
 			$stmt->execute();
@@ -119,7 +119,7 @@ class BuddyService extends BaseDAO{
 
 	public function edit($newbuddy){
 		try {
-			$sql = "UPDATE buddy set date_last_updated=:datelastupdated, record_status=:status, name=:name, tagline=:tagline, address=:address, telphone=:telphone, email=:email, fax=:fax, url=:url, seed=:seed WHERE id=:id";
+			$sql = "UPDATE buddy SET date_last_updated=:datelastupdated, record_status=:status, name=:name, tagline=:tagline, address=:address, telphone=:telphone, email=:email, fax=:fax, url=:url, seed=:seed WHERE id=:id";
 			$stmt = $this->db->prepare ($sql);
 			$stmt->bindValue("datelastupdated", $newbuddy->dateupdated, PDO::PARAM_STR );
 			$stmt->bindValue("status", (int)$newbuddy->status, PDO::PARAM_STR );
@@ -158,8 +158,8 @@ class BuddyService extends BaseDAO{
 			//Rating
 
 			//comment
-			
-			//Delete location, searchtag, image, 
+
+			//Delete location, searchtag, image,
 
 			$sql = "DELETE FROM buddy WHERE id=:id";
 			$stmt = $this->db->prepare ($sql);
@@ -423,6 +423,43 @@ class BuddyService extends BaseDAO{
 
 	public function deleteBuddyImage($imagePath){
 		unlink($imagePath);
+	}
+
+	public function search($name, $status, $seed, $dcategoryId){
+		try {
+			$query = "";
+			if($status != ""){
+				$query .= "AND d.record_status=:status ";
+			}
+			
+			if($seed != ""){
+				$query .= "AND d.seed=:seed ";
+			}
+
+			$sql = "SELECT * FROM buddy d WHERE d.name LIKE :query AND d.dashboard_category_id =:dashboardCategoryId ". $query ."ORDER BY d.name ASC";
+			$stmt = $this->db->prepare($sql);
+			$stmt->bindValue('query', $name.'%');
+			$stmt->bindValue('dashboardCategoryId', $dcategoryId);
+
+			if($status != ""){
+				$stmt->bindValue('status', (int)$status);
+			}
+
+			if($seed != ""){
+				$stmt->bindValue('seed', $seed);
+			}
+				
+			$stmt->execute();
+			$results =  $stmt->fetchAll();
+			if(!empty($results)){
+				return $this->buildAllBuddyData($results, $dcategoryId);
+			}
+			
+			return null;
+
+		}catch (PDOException $e){
+			throw new CustomException($e);
+		}
 	}
 
 }

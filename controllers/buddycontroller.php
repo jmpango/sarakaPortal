@@ -38,6 +38,16 @@ class BuddyController extends BaseController{
 			$this->view->set('offset', $this->service->offset.','.$this->service->totalCount.','.$dashCategoryID);
 			$this->view->set('dashcategory', $dashboardCategory);
 			$this->view->set('buddies', $buddies);
+
+			$cpanelService = new CpanelService();
+			$seedings = $cpanelService->getSeedings();
+
+			if($seedings == null){
+				$seedings = array();
+			}
+
+			$this->view->set('seedings', $seedings);
+
 			return  $this->view->output();
 		} catch (CustomException $e) {
 			$message = $e->getMessage() ;
@@ -52,6 +62,14 @@ class BuddyController extends BaseController{
 
 	public function add($dcategory_id){
 		$this->setView('buddy'.DS.'add');
+		$cpanelService = new CpanelService();
+		$seedings = $cpanelService->getSeedings();
+
+		if($seedings == null){
+			$seedings = array();
+		}
+
+		$this->view->set('seedings', $seedings);
 		$this->view->set('dashcategory', $this->getDashboardCategory($dcategory_id));
 		return $this->view->output();
 	}
@@ -73,8 +91,8 @@ class BuddyController extends BaseController{
 		$name = isset($_POST['name']) ? trim($_POST['name']) : null;
 		$telphone1 = isset($_POST['telphone1']) ? trim($_POST['telphone1']) : null;
 
-		if(empty($name) || empty($telphone1)){
-			$message = 'Buddy should have a name and atleast a telphoneNo.';
+		if(empty($name) || empty($telphone1) || empty($_POST['seed'])){
+			$message = 'Buddy should have a name, atleast one telphoneNo and belongs to a seed.';
 		}else{
 
 			try{
@@ -170,9 +188,16 @@ class BuddyController extends BaseController{
 		$this->view->set('email', $buddy->email);
 		$this->view->set('fax', $buddy->fax);
 		$this->view->set('url', $buddy->url);
-		
-		//TODO add a list of Seeeds.
-		
+
+		$cpanelService = new CpanelService();
+		$seedings = $cpanelService->getSeedings();
+
+		if($seedings == null){
+			$seedings = array();
+		}
+
+		$this->view->set('seedings', $seedings);
+
 		$this->view->set('dashcategory', $dashboardCategory);
 		return $this->view->output();
 	}
@@ -519,7 +544,6 @@ class BuddyController extends BaseController{
 		$this->setService('buddy');
 		$buddy = $this->service->getBuddyById($buddyId);
 		$buddy->setDashboardCategory($this->getDashboardCategory($this->service->getDashboardCategoryIdByBuddyId($buddyId)));
-		//$images = $this->service->getAllImagesByBuddyId($buddyId);
 
 		if(empty($images)){
 			$images = array();
@@ -646,7 +670,7 @@ class BuddyController extends BaseController{
 		$this->view->set('editImageName', $_POST['editImageName']);
 		return $this->view->output();
 	}
-	
+
 	public function smallImage($imageName){
 		ob_start();
 		$fileName = HOME . $this->service->getBuddyImage($imageName);
@@ -656,6 +680,72 @@ class BuddyController extends BaseController{
 		$output = ob_get_contents();
 		ob_end_clean();
 		echo $output;
+	}
+
+	public function search(){
+		if(!isset($_POST['searchForm'])){
+			header('Location:'.BASEURL.DS.'dashboard'.DS.'listing');
+		}
+
+		$this->setView('buddy'.DS.'listing');
+
+		$message;
+		$query = isset($_POST['query']) ? trim($_POST['query']) : null;
+
+		if(!empty($query) || ($_POST['status'] !='') || ($_POST['seed'] !='') ){
+			$this->setService('buddy');
+			$buddies = $this->service->search(ucwords($query), $_POST['status'], $_POST['seed'], $_POST['dcategoryId']);
+			if($buddies == null){
+				$message  = 'No record found.';
+			}else{
+				try {
+					$end= $this->service->offset + sizeof($buddies) ;
+					$dashboardCategory = $this->getDashboardCategory($_POST['dcategoryId']);
+
+
+					$this->setView('buddy'.DS.'listing');
+					$this->view->set('searchForm', $_POST);
+					$this->view->set('pgtotal', '1 - '. $end. ' of '.sizeof($buddies));
+					$this->view->set('offset', $this->service->offset.','.sizeof($buddies));
+					$this->view->set('dashcategory', $dashboardCategory);
+					$this->view->set('buddies', $buddies);
+					$cpanelService = new CpanelService();
+					$seedings = $cpanelService->getSeedings();
+
+					if($seedings == null){
+						$seedings = array();
+					}
+
+					$this->view->set('seedings', $seedings);
+					$this->view->set(SYSTEM_INFO_MESSAGE, 'Search query returned '.sizeof($buddies).' records.');
+					return  $this->view->output();
+
+				} catch (CustomException $e) {
+					$message = $e->getMessage() ;
+				}
+			}
+		}
+		$this->view->set('searchForm', $_POST);
+		if (!empty($message)){
+			$this->view->set(SYSTEM_ERROR_MESSAGE, $message);
+		}
+		return $this->listing($_POST['dcategoryId']);
+	}
+
+	public function usage($buddyId){
+		$this->setService('buddy');
+		$buddy = $this->service->getBuddyById($buddyId);
+		$buddy->setDashboardCategory($this->getDashboardCategory($this->service->getDashboardCategoryIdByBuddyId($buddyId)));
+		$searchtags = $this->service->getAllSearchtagsByBuddyId($buddyId);
+
+		if(empty($searchtags)){
+			$searchtags = array();
+		}
+
+
+		$this->setView('buddy'.DS.'usage');
+		$this->view->set('buddy', $buddy);
+		return $this->view->output();
 	}
 }
 ?>

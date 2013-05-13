@@ -3,6 +3,22 @@ include_once HOME . DS . 'model' . DS . 'exception' . DS . 'customexception.php'
 
 class CpanelService extends BaseDAO{
 
+
+	public  function getSeedings(){
+		try {
+			$sql = "SELECT * FROM seeding d ORDER BY d.name";
+			$stmt = $this->db->prepare ($sql);
+			$stmt->execute();
+			$results =  $stmt->fetchAll();
+			if(!empty($results)){
+				return $this->buildSeedingData($results);
+			}
+			return null;
+		}catch (PDOException $e){
+			throw new CustomException($e->getMessage());
+		}
+	}
+
 	public function getALLSeedings(){
 		try {
 

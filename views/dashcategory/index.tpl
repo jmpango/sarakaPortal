@@ -17,7 +17,6 @@ if(isset($_SESSION['user'])){
     				<form action="<?php echo BASEURL;?>/dashcategory/cat/search/<?php echo $dashboard->id; ?>" method="post" >
     					<fieldset>
     					<input type="hidden" name="dashboardId" value="<?php echo $dashboard->id; ?>"/>
-    						<legend>Search Panel</legend>
     							<div class="tabular">
     								<span>Name: </span><input type="text" name="query" value="<?php if(isset($searchForm)) echo $searchForm['query'];?>"/><br>
     							</div>

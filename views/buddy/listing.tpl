@@ -16,11 +16,12 @@ if(isset($_SESSION['user'])){
     				<span class="text">Buddy Listing</span>
     			</div>
     			<div class="search_box">
-    				<form action="" method="post" >
+    				<form action="<?php echo BASEURL . DS . 'buddy'. DS . 'search';?>" method="post" >
 						<fieldset>
-							<legend>Search Panel</legend>
 							<div class="tabular">
-								<span>Buddy Name: </span><input name="name"  type="text"><br>
+								<span>Buddy Name: </span>
+								<input type="text" name="query" value="<?php if(isset($searchForm)) echo $searchForm['query'];?>"/><br>
+								<input name="dcategoryId"  type="hidden" value = "<?php echo $dashcategory->getId();?>"/>
 							</div>
 							<div class="tabular">
 								<span>Status: </span>
@@ -31,7 +32,22 @@ if(isset($_SESSION['user'])){
 								</select>
 							</div>
 							<div class="tabular">
-								<input type="submit" value="Search" name="searchBtn" class="uiButton"><br>
+								<span>Seed: </span>
+								<select name="seed">
+									<option></option>
+									<?php 
+		    							if($seedings):
+		    							foreach ($seedings as $seed):
+    								?>
+									<option value="<?php echo $seed->name?>"><?php echo $seed->name;?></option>
+									<?php 
+		    							endforeach;
+		    							endif;
+    								?>
+								</select>
+							</div>
+							<div class="tabular">
+								<input type="submit" value="Search" name="searchForm" class="uiButton"><br>
 							</div>
 						</fieldset>
     				</form>
@@ -60,6 +76,7 @@ if(isset($_SESSION['user'])){
     							<th>Telphone Nos</th>
     							<th>Last Updated</th>
     							<th>Status</th>
+    							<th>Seed</th>
     							<th></th>
     						</tr>
     					</thead>
@@ -75,8 +92,9 @@ if(isset($_SESSION['user'])){
     							<td><?php echo $buddy->getAddress();?></td>
     							<td><?php echo $buddy->getTelphoneNos();?></td>
     							<td><?php echo $buddy->getDateupdated();?></td>
-    							<td><?php echo ($buddy->getStatus() == 1)? '<span class=\'enabled\' title=\'enabled\'></span>' : '<span class=\'disabled\' title=\'disabled\'></span>';?></td>
-    							<td>
+    							<td style="background: rgb(166, 171, 182);"><?php echo ($buddy->getStatus() == 1)? '<span class=\'enabled\' title=\'enabled\'></span>' : '<span class=\'disabled\' title=\'disabled\'></span>';?></td>
+    							<td style="background: rgb(235, 141, 141);"><?php echo $buddy->getSeed();?></td>
+    							<td style="background: rgb(231, 224, 142);">
     								<span id="<?php echo $buddy->getId();?>" class="more">[View..]</span>
     								<div id="more_dv_<?php echo $buddy->getId();?>" style="z-index: 10; position: absolute; visibility: hidden; border: 1px solid rgb(204, 204, 204); padding: 5px;background: rgb(247, 247, 247);">
     									<p style="margin-bottom: 5px;">
@@ -92,7 +110,7 @@ if(isset($_SESSION['user'])){
     										<a href="" title="view Buddy comments">Comments</a>
     									</p>
     									<p style="margin-bottom: 5px;">
-    										<a href="" title="view Buddy Mobile Usage">Usage</a>
+    										<a href="<?php echo BASEURL. DS.'buddy'.DS.'cat'.DS.'usage'.DS.$buddy->getId();?>" title="view Buddy Mobile Usage">Usage</a>
     									</p>
     								</div>		
     							</td>
