@@ -6,6 +6,8 @@ class MobileUsage extends BaseData{
 	var $callHit;
 	var $urlHit;
 	var $emailHit;
+	var $commentHit;
+	var $rateHit;
 	var $buddyId;
 
 	public function __construct() {
@@ -50,6 +52,22 @@ class MobileUsage extends BaseData{
 
 	public function getBuddyId(){
 		return $this->buddyId;
+	}
+
+	public function setCommentHit($commentHit){
+		$this->commentHit = $commentHit;
+	}
+
+	public function getCommentHit(){
+		return $this->commentHit;
+	}
+
+	public function setRateHit($rateHit){
+		$this->rateHit = $rateHit;
+	}
+
+	public function getRateHit(){
+		return $this->rateHit;
 	}
 }
 ?>

@@ -18,7 +18,7 @@ self::$db->query("CREATE TABLE IF NOT EXISTS buddy_ratings(id INT NOT NULL AUTO_
 self::$db->query("CREATE TABLE IF NOT EXISTS buddy_locations(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, date_last_updated DATE, record_status INT(5), location_name VARCHAR(255),  buddy_id INT NOT NULL, FOREIGN KEY(buddy_id) REFERENCES buddy(id))");
 self::$db->query("CREATE TABLE IF NOT EXISTS buddy_search_tags(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, date_last_updated DATE, record_status INT(5), search_value VARCHAR(255),  buddy_id INT NOT NULL, FOREIGN KEY(buddy_id) REFERENCES buddy(id))");
 self::$db->query("CREATE TABLE IF NOT EXISTS buddy_comments(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, date_last_updated DATE, record_status INT(5), comment VARCHAR(1000), author_name VARCHAR(255), date_submitted DATE, buddy_id INT NOT NULL, FOREIGN KEY(buddy_id) REFERENCES buddy(id))");
-self::$db->query("CREATE TABLE IF NOT EXISTS buddy_usage(id INT PRIMARY KEY AUTO_INCREMENT, page_hits INT, call_hits INT, url_hits INT, email_hits INT, submitted_date DATE , buddy_id INT, FOREIGN KEY(buddy_id) REFERENCES buddy(id))");
+self::$db->query("CREATE TABLE IF NOT EXISTS buddy_usage(id INT PRIMARY KEY AUTO_INCREMENT, page_hits INT, call_hits INT, url_hits INT, email_hits INT, comment_hits INT, rate_hits INT, submitted_date DATE , buddy_id INT NOT NULL, FOREIGN KEY(buddy_id) REFERENCES buddy(id))");
 self::$db->query("CREATE TABLE IF NOT EXISTS seeding(id INT PRIMARY KEY AUTO_INCREMENT, name VARCHAR(255), description VARCHAR(255))");
 
 /** INSERT DATA */

@@ -4,6 +4,8 @@ class BuddyUsage extends BaseData{
 	var $callHits;
 	var $urlHits;
 	var $emailHits;
+	var $commentHits;
+	var $rateHits;
 	var $submittedDate;
 	var $buddy;
 
@@ -57,6 +59,22 @@ class BuddyUsage extends BaseData{
 
 	public function getBuddy(){
 		return $this->buddy;
+	}
+
+	public function setCommentHits($commentHits){
+		$this->commentHits = $commentHits;
+	}
+
+	public function getCommentHits(){
+		return $this->commentHits;
+	}
+
+	public function setRateHits($rateHits){
+		$this->rateHits = $rateHits;
+	}
+
+	public function getRateHits(){
+		return $this->rateHits;
 	}
 }
 ?>

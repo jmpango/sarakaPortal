@@ -736,6 +736,7 @@ class BuddyController extends BaseController{
 		$this->setService('buddy');
 		$buddy = $this->service->getBuddyById($buddyId);
 		$buddy->setDashboardCategory($this->getDashboardCategory($this->service->getDashboardCategoryIdByBuddyId($buddyId)));
+
 		$searchtags = $this->service->getAllSearchtagsByBuddyId($buddyId);
 
 		if(empty($searchtags)){

@@ -236,8 +236,6 @@ class MDashboardService extends BaseDAO{
 	}
 
 	public function saveMobileUsage($hits){
-		//TODO add the rate and comment hit.
-		
 		$arr = json_decode($hits, true);
 		$usages = array();
 		foreach ($arr['usages'] as $element) {
@@ -248,6 +246,8 @@ class MDashboardService extends BaseDAO{
 			$usage->setCallHit((int)$element['callHit']);
 			$usage->setUrlHit((int)$element['urlHit']);
 			$usage->setEmailHit((int)$element['emailHit']);
+			$usage->setRateHit((int)$element['rateHit']);
+			$usage->setCommentHit((int)$element['commentHit']);
 			$usage->setBuddyId((int)$element['buddyId']);
 
 			array_push($usages, $usage);
@@ -273,25 +273,31 @@ class MDashboardService extends BaseDAO{
 					$existingUsage->callHit = (int)$result['call_hits'] + $usage->callHit;
 					$existingUsage->urlHit = (int)$result['url_hits'] + $usage->urlHit;
 					$existingUsage->emailHit = (int)$result['email_hits'] + $usage->emailHit;
+					$existingUsage->callHit = (int)$result['call_hits'] + $usage->callHit;
+					$existingUsage->rateHit = (int)$result['rate_hits'] + $usage->rateHit;
 
-					$sql = "UPDATE buddy_usage set page_hits=:pagehit, call_hits=:callhit, url_hits=:urlhit, email_hits=:emailhit WHERE month(submitted_date)=:submitedMonth AND year(submitted_date)=:submittedYear AND buddy_id=:buddyId";
+					$sql = "UPDATE buddy_usage set page_hits=:pagehit, call_hits=:callhit, url_hits=:urlhit, email_hits=:emailhit, comment_hits=:commenthit, rate_hits=:ratehit WHERE month(submitted_date)=:submitedMonth AND year(submitted_date)=:submittedYear AND buddy_id=:buddyId";
 					$stmt = $this->db->prepare ($sql);
 					$stmt->bindValue('pagehit', $existingUsage->pageHit);
 					$stmt->bindValue('callhit', $existingUsage->callHit);
 					$stmt->bindValue('urlhit', $existingUsage->urlHit);
 					$stmt->bindValue('emailhit', $existingUsage->emailHit);
+					$stmt->bindValue('ratehit', $existingUsage->rateHit);
+					$stmt->bindValue('commenthit', $existingUsage->commentHit);
 					$stmt->bindValue('submitedMonth', $month);
 					$stmt->bindValue('submittedYear', $year);
 					$stmt->bindValue('buddyId', $usage->buddyId);
 					$stmt->execute();
 
 				}else{
-					$sql = "INSERT INTO buddy_usage(page_hits, call_hits, url_hits, email_hits, submitted_date, buddy_id) VALUES(:pagehits, :callhits, :urlhits, :emailhits, :submittedDate, :buddyId)";
+					$sql = "INSERT INTO buddy_usage(page_hits, call_hits, url_hits, email_hits, comment_hits, rate_hits, submitted_date, buddy_id) VALUES(:pagehits, :callhits, :urlhits, :emailhits, :commentHits, :rateHits, :submittedDate, :buddyId)";
 					$stmt = $this->db->prepare ($sql);
 					$stmt->bindValue("pagehits", $usage->pageHit, PDO::PARAM_STR );
 					$stmt->bindValue("callhits", $usage->callHit, PDO::PARAM_STR );
 					$stmt->bindValue("urlhits", $usage->urlHit, PDO::PARAM_STR );
 					$stmt->bindValue("emailhits", $usage->emailHit, PDO::PARAM_STR );
+					$stmt->bindValue('ratehits', $usage->rateHit);
+					$stmt->bindValue('commenthits', $usage->commentHit);
 					$stmt->bindValue("submittedDate", $usage->dateupdated, PDO::PARAM_STR );
 					$stmt->bindValue("buddyId", $usage->buddyId, PDO::PARAM_STR );
 					$stmt->execute();
