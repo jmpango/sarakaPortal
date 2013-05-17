@@ -238,6 +238,7 @@ class MDashboardService extends BaseDAO{
 	public function saveMobileUsage($hits){
 		$arr = json_decode($hits, true);
 		$usages = array();
+
 		foreach ($arr['usages'] as $element) {
 			$usage = new MobileUsage();
 
@@ -253,8 +254,46 @@ class MDashboardService extends BaseDAO{
 			array_push($usages, $usage);
 		}
 
-		try {
+		$comments = array();
 
+		foreach ($arr['comments'] as $element) {
+			$comment = new BuddyComment();
+
+			$comment->setPostedDate($element['postedDate']);
+			$comment->setAuthor($element['owner']);
+			$comment->setComment($element['comment']);
+			$comment->setBuddyId($element['buddyId']);
+
+			array_push($comments, $comment);
+		}
+
+		$rates = array();
+
+		foreach ($arr['rates'] as $element) {
+			$rate = new BuddyRate();
+
+			$rate->setCurrentRate((int)$element['rate']);
+			$rate->setBuddyId($element['buddyId']);
+
+			array_push($rates, $rate);
+		}
+
+
+		try {
+			$this->insertUsageData($usages);
+			$this->insertCommentData($comments);
+			$this->insertRateData($rates);
+
+			$response["sucess"] = 1;
+			return json_encode($response);
+		}catch (PDOException $e){
+			$response["sucess"] = $e;
+			return json_encode($response);
+		}
+	}
+
+	public function insertUsageData($usages){
+		try {
 			foreach ($usages as $usage){
 				$month = date("m", strtotime($usage->getDateupdated()));
 				$year =  date("Y", strtotime($usage->getDateupdated()));
@@ -273,7 +312,7 @@ class MDashboardService extends BaseDAO{
 					$existingUsage->callHit = (int)$result['call_hits'] + $usage->callHit;
 					$existingUsage->urlHit = (int)$result['url_hits'] + $usage->urlHit;
 					$existingUsage->emailHit = (int)$result['email_hits'] + $usage->emailHit;
-					$existingUsage->callHit = (int)$result['call_hits'] + $usage->callHit;
+					$existingUsage->commentHit = (int)$result['comment_hits'] + $usage->commentHit;
 					$existingUsage->rateHit = (int)$result['rate_hits'] + $usage->rateHit;
 
 					$sql = "UPDATE buddy_usage set page_hits=:pagehit, call_hits=:callhit, url_hits=:urlhit, email_hits=:emailhit, comment_hits=:commenthit, rate_hits=:ratehit WHERE month(submitted_date)=:submitedMonth AND year(submitted_date)=:submittedYear AND buddy_id=:buddyId";
@@ -286,7 +325,7 @@ class MDashboardService extends BaseDAO{
 					$stmt->bindValue('commenthit', $existingUsage->commentHit);
 					$stmt->bindValue('submitedMonth', $month);
 					$stmt->bindValue('submittedYear', $year);
-					$stmt->bindValue('buddyId', $usage->buddyId);
+					$stmt->bindValue('buddyId', $existingUsage->buddyId);
 					$stmt->execute();
 
 				}else{
@@ -296,18 +335,70 @@ class MDashboardService extends BaseDAO{
 					$stmt->bindValue("callhits", $usage->callHit, PDO::PARAM_STR );
 					$stmt->bindValue("urlhits", $usage->urlHit, PDO::PARAM_STR );
 					$stmt->bindValue("emailhits", $usage->emailHit, PDO::PARAM_STR );
-					$stmt->bindValue('ratehits', $usage->rateHit);
-					$stmt->bindValue('commenthits', $usage->commentHit);
+					$stmt->bindValue('ratehits', $usage->rateHit, PDO::PARAM_STR );
+					$stmt->bindValue('commenthits', $usage->commentHit, PDO::PARAM_STR );
 					$stmt->bindValue("submittedDate", $usage->dateupdated, PDO::PARAM_STR );
 					$stmt->bindValue("buddyId", $usage->buddyId, PDO::PARAM_STR );
 					$stmt->execute();
 				}
 			}
-			$response["sucess"] = 1;
-			return json_encode($response);
 		}catch (PDOException $e){
-			$response["sucess"] = $e;
-			return json_encode($response);
+			return new CustomException($e);
+		}
+	}
+
+	public function insertCommentData($comments){
+		try {
+			foreach ($comments as $comment){
+				$month = date("m", strtotime($usage->getDateupdated()));
+				$year =  date("Y", strtotime($usage->getDateupdated()));
+
+				$sql = "SELECT * FROM buddy_usage u WHERE month(u.submitted_date) = :submitedMonth AND year(u.submitted_date) = :submittedYear AND u.buddy_id = :buddyId";
+				$stmt = $this->db->prepare ($sql);
+				$stmt->bindValue('submitedMonth', $month);
+				$stmt->bindValue('submittedYear', $year);
+				$stmt->bindValue('buddyId', $usage->buddyId);
+				$stmt->execute();
+				$result =  $stmt->fetch();
+
+				if(!empty($result)){
+					$existingUsage = new MobileUsage();
+					$existingUsage->pageHit = (int)$result['page_hits'] + $usage->pageHit;
+					$existingUsage->callHit = (int)$result['call_hits'] + $usage->callHit;
+					$existingUsage->urlHit = (int)$result['url_hits'] + $usage->urlHit;
+					$existingUsage->emailHit = (int)$result['email_hits'] + $usage->emailHit;
+					$existingUsage->commentHit = (int)$result['comment_hits'] + $usage->commentHit;
+					$existingUsage->rateHit = (int)$result['rate_hits'] + $usage->rateHit;
+
+					$sql = "UPDATE buddy_usage set page_hits=:pagehit, call_hits=:callhit, url_hits=:urlhit, email_hits=:emailhit, comment_hits=:commenthit, rate_hits=:ratehit WHERE month(submitted_date)=:submitedMonth AND year(submitted_date)=:submittedYear AND buddy_id=:buddyId";
+					$stmt = $this->db->prepare ($sql);
+					$stmt->bindValue('pagehit', $existingUsage->pageHit);
+					$stmt->bindValue('callhit', $existingUsage->callHit);
+					$stmt->bindValue('urlhit', $existingUsage->urlHit);
+					$stmt->bindValue('emailhit', $existingUsage->emailHit);
+					$stmt->bindValue('ratehit', $existingUsage->rateHit);
+					$stmt->bindValue('commenthit', $existingUsage->commentHit);
+					$stmt->bindValue('submitedMonth', $month);
+					$stmt->bindValue('submittedYear', $year);
+					$stmt->bindValue('buddyId', $existingUsage->buddyId);
+					$stmt->execute();
+
+				}else{
+					$sql = "INSERT INTO buddy_usage(page_hits, call_hits, url_hits, email_hits, comment_hits, rate_hits, submitted_date, buddy_id) VALUES(:pagehits, :callhits, :urlhits, :emailhits, :commentHits, :rateHits, :submittedDate, :buddyId)";
+					$stmt = $this->db->prepare ($sql);
+					$stmt->bindValue("pagehits", $usage->pageHit, PDO::PARAM_STR );
+					$stmt->bindValue("callhits", $usage->callHit, PDO::PARAM_STR );
+					$stmt->bindValue("urlhits", $usage->urlHit, PDO::PARAM_STR );
+					$stmt->bindValue("emailhits", $usage->emailHit, PDO::PARAM_STR );
+					$stmt->bindValue('ratehits', $usage->rateHit, PDO::PARAM_STR );
+					$stmt->bindValue('commenthits', $usage->commentHit, PDO::PARAM_STR );
+					$stmt->bindValue("submittedDate", $usage->dateupdated, PDO::PARAM_STR );
+					$stmt->bindValue("buddyId", $usage->buddyId, PDO::PARAM_STR );
+					$stmt->execute();
+				}
+			}
+		}catch (PDOException $e){
+			return new CustomException($e);
 		}
 	}
 }
