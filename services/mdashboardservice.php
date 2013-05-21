@@ -349,52 +349,59 @@ class MDashboardService extends BaseDAO{
 
 	public function insertCommentData($comments){
 		try {
-			foreach ($comments as $comment){
-				$month = date("m", strtotime($usage->getDateupdated()));
-				$year =  date("Y", strtotime($usage->getDateupdated()));
-
-				$sql = "SELECT * FROM buddy_usage u WHERE month(u.submitted_date) = :submitedMonth AND year(u.submitted_date) = :submittedYear AND u.buddy_id = :buddyId";
-				$stmt = $this->db->prepare ($sql);
-				$stmt->bindValue('submitedMonth', $month);
-				$stmt->bindValue('submittedYear', $year);
-				$stmt->bindValue('buddyId', $usage->buddyId);
-				$stmt->execute();
-				$result =  $stmt->fetch();
-
-				if(!empty($result)){
-					$existingUsage = new MobileUsage();
-					$existingUsage->pageHit = (int)$result['page_hits'] + $usage->pageHit;
-					$existingUsage->callHit = (int)$result['call_hits'] + $usage->callHit;
-					$existingUsage->urlHit = (int)$result['url_hits'] + $usage->urlHit;
-					$existingUsage->emailHit = (int)$result['email_hits'] + $usage->emailHit;
-					$existingUsage->commentHit = (int)$result['comment_hits'] + $usage->commentHit;
-					$existingUsage->rateHit = (int)$result['rate_hits'] + $usage->rateHit;
-
-					$sql = "UPDATE buddy_usage set page_hits=:pagehit, call_hits=:callhit, url_hits=:urlhit, email_hits=:emailhit, comment_hits=:commenthit, rate_hits=:ratehit WHERE month(submitted_date)=:submitedMonth AND year(submitted_date)=:submittedYear AND buddy_id=:buddyId";
+			if(!empty($comments)){
+				foreach ($comments as $comment){
+					$sql = "INSERT INTO buddy_comments(date_submitted, comment, author_name, buddy_id) VALUES(:datePosted, :comment, :author, :buddyId)";
 					$stmt = $this->db->prepare ($sql);
-					$stmt->bindValue('pagehit', $existingUsage->pageHit);
-					$stmt->bindValue('callhit', $existingUsage->callHit);
-					$stmt->bindValue('urlhit', $existingUsage->urlHit);
-					$stmt->bindValue('emailhit', $existingUsage->emailHit);
-					$stmt->bindValue('ratehit', $existingUsage->rateHit);
-					$stmt->bindValue('commenthit', $existingUsage->commentHit);
-					$stmt->bindValue('submitedMonth', $month);
-					$stmt->bindValue('submittedYear', $year);
-					$stmt->bindValue('buddyId', $existingUsage->buddyId);
+					$stmt->bindValue("datePosted", $comment->postedDate, PDO::PARAM_STR );
+					$stmt->bindValue("comment", $comment->comment, PDO::PARAM_STR );
+					$stmt->bindValue("author", $comment->author, PDO::PARAM_STR );
+					$stmt->bindValue("buddyId", $comment->buddyId, PDO::PARAM_STR );
 					$stmt->execute();
+				}
+			}
+		}catch (PDOException $e){
+			return new CustomException($e);
+		}
+	}
 
-				}else{
-					$sql = "INSERT INTO buddy_usage(page_hits, call_hits, url_hits, email_hits, comment_hits, rate_hits, submitted_date, buddy_id) VALUES(:pagehits, :callhits, :urlhits, :emailhits, :commentHits, :rateHits, :submittedDate, :buddyId)";
+	/**
+	 * Responsible to insert mobile sent ratings
+	 * @param Comments $comments
+	 * @return CustomException
+	 */
+	public function insertRateData($rates){
+		try {
+			if(!empty($rates)){
+				foreach ($rates as $rate){
+						
+					$sql = "SELECT * FROM buddy_ratings u WHERE u.buddy_id = :buddyId";
 					$stmt = $this->db->prepare ($sql);
-					$stmt->bindValue("pagehits", $usage->pageHit, PDO::PARAM_STR );
-					$stmt->bindValue("callhits", $usage->callHit, PDO::PARAM_STR );
-					$stmt->bindValue("urlhits", $usage->urlHit, PDO::PARAM_STR );
-					$stmt->bindValue("emailhits", $usage->emailHit, PDO::PARAM_STR );
-					$stmt->bindValue('ratehits', $usage->rateHit, PDO::PARAM_STR );
-					$stmt->bindValue('commenthits', $usage->commentHit, PDO::PARAM_STR );
-					$stmt->bindValue("submittedDate", $usage->dateupdated, PDO::PARAM_STR );
-					$stmt->bindValue("buddyId", $usage->buddyId, PDO::PARAM_STR );
+					$stmt->bindValue('buddyId', $rate->buddyId);
 					$stmt->execute();
+					$result =  $stmt->fetch();
+						
+					if(!empty($result)){
+						$existingRate = new BuddyRate();
+						$existingRate->prvRate = (int)$result['current_rate'];
+						
+						$sql = "UPDATE buddy_ratings set prv_rate=:prvrate, current_rate=:currentrate WHERE buddy_id=:buddyId";
+						$stmt = $this->db->prepare ($sql);
+						$stmt->bindValue('prvrate', (int)$existingRate->prvRate, PDO::PARAM_STR);
+						$stmt->bindValue('currentrate', (int)$rate->currentRate, PDO::PARAM_STR);
+						$stmt->bindValue('buddyId', $rate->buddyId, PDO::PARAM_STR);
+						$stmt->execute();
+							
+					}else{
+						$sql = "INSERT INTO buddy_ratings(prv_rate, current_rate, buddy_id) VALUES(:prvrate, :currentrate, :buddyId)";
+						$stmt = $this->db->prepare ($sql);
+						$rate->pageHit = 0 ;
+						$stmt->bindValue("prvrate", $rate->pageHit, PDO::PARAM_STR );
+						$stmt->bindValue("currentrate", $rate->currentRate, PDO::PARAM_STR );
+						$stmt->bindValue("buddyId", $rate->buddyId, PDO::PARAM_STR );
+						$stmt->execute();
+					}
+						
 				}
 			}
 		}catch (PDOException $e){
